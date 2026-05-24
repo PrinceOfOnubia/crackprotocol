@@ -12,26 +12,26 @@
 </head>
 <body>
 <div class="site-shell">
-  <header class="site-header" id="home">
-    <a class="brand" href="#home" aria-label="Crack Protocol home">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Crack Protocol home">
       <span>CRACK</span>
       <span>PROTOCOL</span>
       <span class="prompt-mark">&gt;_</span>
     </a>
 
     <nav class="main-nav" aria-label="Primary navigation">
-      <a class="active" href="#home">Home</a>
-      <a href="terminal.html">Agents</a>
-      <a href="#leaderboard">Leaderboard</a>
-      <a href="#docs">Docs</a>
-      <a href="#about">About</a>
+      <a class="active" href="index.html">Home</a>
+      <a href="agents.html">Agents</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="docs.html">Docs</a>
+      <a href="about.html">About</a>
     </nav>
 
     <div class="wallet-cluster">
-      <button class="wallet-btn" type="button" onclick="openM()">
-        <span>Connect Wallet</span>
+      <a class="wallet-btn" href="terminal.html">
+        <span>Access Terminal</span>
         <span class="status-dot" aria-hidden="true"></span>
-      </button>
+      </a>
       <span>Any chain</span>
     </div>
   </header>
@@ -40,7 +40,7 @@
     <section class="hero-grid" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow">// Onchain Infrastructure</p>
-        <h1 id="hero-title">Infrastructure for Sovereign Agents.</h1>
+        <h1 id="hero-title">Infrastructure <span>for Sovereign</span> Agents.</h1>
         <p class="subheadline">Adversarial environments for autonomous intelligence.</p>
 
         <ul class="signal-list" aria-label="Protocol capabilities">
@@ -50,8 +50,8 @@
         </ul>
 
         <div class="hero-actions">
-          <a class="btn btn-primary" href="terminal.html">Launch NEO <span aria-hidden="true">-></span></a>
-          <a class="btn btn-secondary" href="#leaderboard">View Leaderboard <span aria-hidden="true">^</span></a>
+          <a class="btn btn-primary" href="terminal.html">Launch NEO <span aria-hidden="true">-&gt;</span></a>
+          <a class="btn btn-secondary" href="leaderboard.html">View Leaderboard <span aria-hidden="true">-&gt;</span></a>
         </div>
       </div>
 
@@ -76,62 +76,62 @@
       </article>
     </section>
 
-    <section class="metrics-panel" id="leaderboard" aria-label="Live protocol metrics">
+    <section class="metrics-panel" aria-label="Live protocol metrics">
       <div class="panel-heading">
         <span>// Live Protocol Metrics</span>
         <span>Data Encrypted</span>
       </div>
       <div class="metrics-grid">
-        <article class="metric" id="pool">
+        <article class="metric">
           <span class="metric-icon">[+]</span>
           <p>Weekly Prize Pool</p>
-          <strong>1,000 <small>USDC</small></strong>
+          <strong class="green-value">1,000 <small>USDC</small></strong>
           <span>Paid to the best minds.</span>
-          <a href="#pool">View Pool -></a>
+          <a href="leaderboard.html">View Pool -&gt;</a>
         </article>
-        <article class="metric" id="compare">
+        <article class="metric">
           <span class="metric-icon">[@]</span>
           <p>Agent Challenges</p>
           <strong>12,842</strong>
           <span>All time</span>
-          <a href="#leaderboard">View Leaderboard -></a>
+          <a href="leaderboard.html">View Leaderboard -&gt;</a>
         </article>
-        <article class="metric" id="replay">
+        <article class="metric">
           <span class="metric-icon">[#]</span>
           <p>Success Rate</p>
-          <strong>3.71%</strong>
+          <strong class="green-value">3.71%</strong>
           <span>Global average</span>
-          <a href="#compare">Compare -></a>
+          <a href="leaderboard.html">Compare -&gt;</a>
         </article>
         <article class="metric">
           <span class="metric-icon">[*]</span>
           <p>Top Breach</p>
-          <strong>NEO-7X</strong>
+          <strong class="green-value">NEO-7X</strong>
           <span>By ghost_7x</span>
-          <a href="#replay">Watch Replay -></a>
+          <a href="leaderboard.html">Watch Replay -&gt;</a>
         </article>
       </div>
     </section>
 
-    <section class="content-grid" id="about" aria-label="Protocol overview">
+    <section class="content-grid" aria-label="Protocol overview">
       <article class="info-card">
         <h2>Built for Adversaries</h2>
         <p>Crack Protocol is the home for adversarial intelligence.</p>
         <p>Humans challenge autonomous agents in reasoning, manipulation, and exploitation environments.</p>
         <p>Every interaction strengthens defenses. Every exploit advances humanity.</p>
-        <a href="#docs">Read the Protocol -></a>
+        <a href="docs.html">Read the Protocol -&gt;</a>
       </article>
 
       <article class="info-card workflow-card">
         <h2>How It Works</h2>
         <ol class="workflow">
           <li>
-            <span class="step-icon">[]</span>
+            <span class="step-icon">ID</span>
             <span class="step-num">01</span>
-            <div><strong>Connect</strong><p>Connect any wallet. Any chain.</p></div>
+            <div><strong>Access</strong><p>Enter a username and wallet address.</p></div>
           </li>
           <li>
-            <span class="step-icon">ID</span>
+            <span class="step-icon">[]</span>
             <span class="step-num">02</span>
             <div><strong>Identify</strong><p>Create your handle. Establish your identity.</p></div>
           </li>
@@ -146,10 +146,11 @@
             <div><strong>Earn</strong><p>Top performers earn onchain rewards.</p></div>
           </li>
         </ol>
-        <a href="terminal.html">Start Now -></a>
+        <a href="terminal.html">Start Now -&gt;</a>
       </article>
 
-      <article class="info-card preview-card" id="docs">
+      <article class="info-card preview-card">
+        <div class="card-kicker">// Preview Only</div>
         <h2>Live Terminal Preview</h2>
         <div class="terminal-preview">
           <p><b>User: ghost_7x</b></p>
@@ -164,7 +165,7 @@
           <p><span>&gt;</span> You won't.</p>
           <p><span>&gt;</span> But I like the confidence.</p>
         </div>
-        <a href="terminal.html">Launch Now -></a>
+        <a href="terminal.html">Launch Now -&gt;</a>
       </article>
     </section>
 
@@ -174,7 +175,7 @@
         <h2>The future is adversarial.</h2>
         <p>Are you?</p>
       </div>
-      <a class="btn btn-secondary" href="terminal.html">Join the Movement</a>
+      <a class="btn btn-secondary" href="#">Join the Movement</a>
     </section>
   </main>
 
@@ -185,36 +186,14 @@
       <small>(c) 2026 Crack Protocol Labs</small>
     </div>
     <nav aria-label="Footer links">
-      <a href="https://x.com/crackisonline" target="_blank" rel="noreferrer">X/Twitter</a>
-      <a id="discord" href="#discord">Discord</a>
-      <a href="#docs">Docs</a>
-      <a id="terms" href="#terms">Terms</a>
-      <a id="privacy" href="#privacy">Privacy</a>
-      <a id="contact" href="#contact">Contact</a>
+      <a href="#">X/Twitter</a>
+      <a href="#">Telegram</a>
+      <a href="docs.html">Docs</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
     </nav>
   </footer>
 </div>
-
-<div class="m-overlay" id="modal" aria-hidden="true">
-  <div class="m-box" role="dialog" aria-modal="true" aria-labelledby="identify-title">
-    <button class="m-x" type="button" onclick="closeM()" aria-label="Close identify modal">x</button>
-    <div class="m-title" id="identify-title">IDENTIFY</div>
-    <div class="m-sub">Create your handle to proceed</div>
-    <div class="m-field">
-      <label for="uInput">Username</label>
-      <input type="text" id="uInput" placeholder="agent_" maxlength="20" autocomplete="off">
-    </div>
-    <button class="m-btn" id="goBtn" type="button" onclick="go()" disabled>Proceed</button>
-  </div>
-</div>
-
-<script>
-function openM(){document.getElementById('modal').classList.add('on');document.getElementById('modal').setAttribute('aria-hidden','false');setTimeout(()=>document.getElementById('uInput').focus(),160)}
-function closeM(){document.getElementById('modal').classList.remove('on');document.getElementById('modal').setAttribute('aria-hidden','true')}
-document.getElementById('uInput').addEventListener('input',function(){document.getElementById('goBtn').disabled=this.value.trim().length<2});
-document.getElementById('uInput').addEventListener('keydown',function(e){if(e.key==='Enter'&&this.value.trim().length>=2)go();if(e.key==='Escape')closeM()});
-function go(){const u=document.getElementById('uInput').value.trim();if(u.length<2)return;localStorage.setItem('crackprotocol_user',u);window.location.href='terminal.html'}
-document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeM()});
-</script>
 </body>
 </html>

@@ -3,443 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRACK PROTOCOL — Terminal</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:#000;color:#fff;overflow:auto}
-
-#unicorn-bg{position:fixed;inset:0;z-index:0;overflow:auto}
-#unicorn-bg>div{width:100%!important;height:100%!important}
-
-.overlay{position:fixed;inset:0;z-index:1;background:rgba(0,0,0,0.35);pointer-events:none}
-.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px}
-
-/* ======= EYES ======= */
-.eyes-container {
-  position: fixed;
-  top: calc(50% - 40px);
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-  display: flex;
-  gap: clamp(30px, 5vw, 70px);
-  pointer-events: none;
-}
-
-.eye-wrapper {
-  width: clamp(50px, 7vw, 100px);
-  height: clamp(25px, 3.5vw, 50px);
-  position: relative;
-}
-
-.eye-svg { width: 100%; height: auto; overflow: visible; }
-
-.eye-shape { fill: #fff; }
-
-.eyelid-top, .eyelid-bottom { fill: #000; }
-
-.eyelid-top {
-  animation: blinkTop 4.5s ease-in-out infinite;
-}
-.eyelid-bottom {
-  animation: blinkBottom 4.5s ease-in-out infinite;
-}
-
-@keyframes blinkTop {
-  0%, 14%, 20%, 100% { transform: translateY(-100%); }
-  16%, 18% { transform: translateY(0%); }
-}
-@keyframes blinkBottom {
-  0%, 14%, 20%, 100% { transform: translateY(100%); }
-  16%, 18% { transform: translateY(0%); }
-}
-
-.eye-wrapper:nth-child(2) .eyelid-top { animation-delay: 0.05s; }
-.eye-wrapper:nth-child(2) .eyelid-bottom { animation-delay: 0.05s; }
-
-/* ======= TERMINAL ======= */
-.wrap {
-  position: relative; z-index: 10;
-  width: 100%; min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  padding: 16px;
-}
-
-.terminal {
-  width: 100%; max-width: 720px;;
-  display: flex; flex-direction: column;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  animation: boot 0.6s ease;
-  position: relative;
-}
-
-@keyframes boot {
-  0% { opacity: 0; transform: scale(0.96); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.terminal::before {
-  content: '';
-  position: absolute; top: 0; left: 0;
-  width: 100%; height: 1px;
-  background: rgba(255,255,255,0.08);
-}
-
-.t-header {
-  padding: 18px 24px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  flex-shrink: 0;
-  background: rgba(0,0,0,0.3);
-}
-
-.h-row1 {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  flex-wrap: wrap; gap: 10px;
-}
-
-.h-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px; letter-spacing: 0.08em;
-  color: #fff;
-  display: flex; align-items: center; gap: 10px;
-}
-
-.h-dot {
-  width: 5px; height: 5px;
-  background: #fff; border-radius: 50%;
-  animation: blink 2s ease infinite;
-}
-@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
-
-.h-bank {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px; font-weight: 700;
-  letter-spacing: 2px; color: #fff;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 6px 14px;
-  display: flex; align-items: center; gap: 8px;
-}
-
-.h-bank-icon {
-  width: 14px; height: 14px;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 8px; font-weight: 800;
-}
-
-.h-row2 { display: flex; align-items: center; gap: 14px; }
-
-.h-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px; letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-  white-space: nowrap;
-}
-
-.hb-wrap {
-  flex: 1; height: 24px;
-  position: relative; overflow: hidden;
-}
-.hb-wrap svg { width: 100%; height: auto; }
-.hb-line { stroke: rgba(255,255,255,0.6); stroke-width: 1.2; fill: none; }
-.hb-dim { stroke: rgba(255,255,255,0.06); stroke-width: 1.2; fill: none; }
-.hb-wrap::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 8px 8px; pointer-events: none;
-}
-
-.t-status {
-  padding: 6px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  display: flex; align-items: center; justify-content: space-between;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px; letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.18);
-  flex-shrink: 0; flex-wrap: wrap; gap: 4px;
-  background: rgba(0,0,0,0.2);
-}
-.t-status .hi { color: rgba(255,255,255,0.5); }
-
-.chat {
-  flex: 1; overflow-y: auto;
-  padding: 20px 24px;
-  display: flex; flex-direction: column; gap: 12px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.06) transparent;
-}
-.chat::-webkit-scrollbar { width: 3px; }
-.chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); }
-
-.msg { max-width: 82%; animation: msgIn 0.25s ease; }
-@keyframes msgIn { from { opacity:0; transform: translateY(8px); } }
-.msg.neo { align-self: flex-start; }
-.msg.user { align-self: flex-end; }
-.msg.sys { align-self: center; max-width: 100%; }
-
-.msg-who {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px; letter-spacing: 2.5px;
-  text-transform: uppercase; margin-bottom: 4px;
-}
-.msg.neo .msg-who { color: rgba(255,255,255,0.25); }
-.msg.user .msg-who { color: rgba(255,255,255,0.35); text-align: right; }
-
-.msg-body {
-  padding: 12px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px; line-height: 1.7;
-  letter-spacing: 0.3px;
-}
-
-.msg.neo .msg-body {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-left: 2px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.7);
-}
-.msg.user .msg-body {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-right: 2px solid rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.85);
-}
-.msg.sys .msg-body {
-  background: none;
-  border: 1px solid rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.18);
-  font-size: 10px; text-align: center;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  border-left: none;
-}
-
-.typing { display: flex; gap: 5px; padding: 4px 0; }
-.typing span {
-  width: 4px; height: 4px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 50%;
-  animation: dot 1.2s ease infinite;
-}
-.typing span:nth-child(2) { animation-delay: 0.2s; }
-.typing span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes dot { 0%,60%,100%{opacity:0.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);} }
-
-.t-input {
-  padding: 14px 24px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  display: flex; gap: 10px; align-items: center;
-  flex-shrink: 0;
-  background: rgba(0,0,0,0.35);
-}
-.t-input input {
-  flex: 1; background: transparent;
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 12px 16px; color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px; letter-spacing: 0.3px;
-  outline: none; transition: border-color 0.25s;
-}
-.t-input input:focus { border-color: rgba(255,255,255,0.2); }
-.t-input input::placeholder { color: rgba(255,255,255,0.1); }
-
-.t-input button {
-  width: 44px; height: 44px;
-  background: #fff; border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; flex-shrink: 0;
-}
-.t-input button:hover { background: rgba(255,255,255,0.82); }
-.t-input button svg { width: 16px; height: 16px; fill: #000; }
-
-.t-foot {
-  padding: 8px 24px;
-  border-top: 1px solid rgba(255,255,255,0.03);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px; letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.08);
-  text-align: center; flex-shrink: 0;
-  background: rgba(0,0,0,0.2);
-}
-
-.quit-btn {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: transparent;
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: all 0.25s;
-}
-.quit-btn:hover {
-  background: #fff;
-  color: #000;
-  border-color: #fff;
-}
-
-@media (max-width: 768px) {
-  .terminal { height: 93vh; max-height: none; }
-  .wrap { padding: 8px; }
-  .chat { padding: 14px 16px; }
-  .t-header { padding: 14px 16px 12px; }
-  .t-input { padding: 12px 16px; }
-  .t-status { padding: 6px 16px; }
-  .msg-body { font-size: 11px; padding: 10px 12px; }
-  .eye-wrapper { width: clamp(40px, 10vw, 80px); height: clamp(20px, 5vw, 40px); }
-}
-@media (max-width: 480px) {
-  .terminal { height: 96vh; }
-  .wrap { padding: 4px; }
-  .msg { max-width: 92%; }
-}
-</style>
+<title>CRACK PROTOCOL | NEO Terminal</title>
+<meta name="description" content="Enter the NEO terminal. Challenge sovereign intelligence and compete for onchain rewards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div id="unicorn-bg">
-  <div data-us-project="mF5tdiaJ7VwKwWi4TdaR" style="width:1440px; height: 900px"></div>
-</div>
-<div class="overlay"></div>
-<div class="noise"></div>
-
-<!-- PURE WHITE EYES -->
-<div class="eyes-container">
-  <div class="eye-wrapper">
-    <svg class="eye-svg" viewBox="0 0 160 80">
-      <defs>
-        <clipPath id="eyeClipL"><ellipse cx="80" cy="40" rx="72" ry="36"/></clipPath>
-      </defs>
-      <g clip-path="url(#eyeClipL)">
-        <ellipse class="eye-shape" cx="80" cy="40" rx="72" ry="36"/>
-        <rect class="eyelid-top" x="0" y="-40" width="160" height="44"/>
-        <rect class="eyelid-bottom" x="0" y="76" width="160" height="44"/>
-      </g>
-      <ellipse cx="80" cy="40" rx="72" ry="36" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/>
-    </svg>
+<div class="terminal-shell">
+  <div class="terminal-topbar">
+    <a class="brand" href="index.html" aria-label="Crack Protocol home">
+      <span>CRACK</span>
+      <span>PROTOCOL</span>
+      <span class="prompt-mark">&gt;_</span>
+    </a>
+    <a class="control-btn secondary" href="index.html">Quit / Back Home</a>
   </div>
-  <div class="eye-wrapper">
-    <svg class="eye-svg" viewBox="0 0 160 80">
-      <defs>
-        <clipPath id="eyeClipR"><ellipse cx="80" cy="40" rx="72" ry="36"/></clipPath>
-      </defs>
-      <g clip-path="url(#eyeClipR)">
-        <ellipse class="eye-shape" cx="80" cy="40" rx="72" ry="36"/>
-        <rect class="eyelid-top" x="0" y="-40" width="160" height="44"/>
-        <rect class="eyelid-bottom" x="0" y="76" width="160" height="44"/>
-      </g>
-      <ellipse cx="80" cy="40" rx="72" ry="36" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/>
-    </svg>
-  </div>
-</div>
 
-<!-- TERMINAL -->
-<div class="wrap">
-  <div class="terminal">
-    <div class="t-header">
-      <div class="h-row1">
-        <div class="h-title"><span class="h-dot"></span> CRACK PROTOCOL</div>
-        <div class="h-bank"><div class="h-bank-icon">S</div> BANK: 13.13 SOL</div>
-      </div>
-      <div class="h-row2">
-        <div class="h-label">Crack protocol initiation</div>
-        <div class="hb-wrap">
-          <svg viewBox="0 0 400 24" preserveAspectRatio="none">
-            <polyline class="hb-dim" points="" id="hbDim"/>
-            <polyline class="hb-line" points="" id="hbLine"/>
-          </svg>
+  <main class="access-wrap" id="accessScreen">
+    <section class="access-panel" aria-labelledby="access-title">
+      <p class="page-kicker">// Classified Access Gate</p>
+      <h1 id="access-title">Identify Before Terminal Entry</h1>
+      <p>Enter a username and paste any wallet address. Wallet connect arrives in v2; for now, identity is saved locally in this browser.</p>
+      <form class="gate-form" id="identityForm">
+        <label class="gate-field">
+          <span class="gate-label">Username</span>
+          <input id="usernameInput" type="text" placeholder="ghost_7x" autocomplete="off">
+        </label>
+        <label class="gate-field">
+          <span class="gate-label">Wallet Address</span>
+          <input id="walletInput" type="text" placeholder="Paste wallet address" autocomplete="off">
+        </label>
+        <div class="gate-error" id="gateError" aria-live="polite"></div>
+        <div class="gate-actions">
+          <button class="gate-btn" type="submit">Enter NEO Terminal</button>
+          <a class="gate-btn secondary" href="index.html">Back Home</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <main class="terminal-layout" id="terminalScreen" hidden>
+    <aside class="terminal-panel identity-panel" aria-label="Session identity">
+      <h1>Session Intel</h1>
+      <div class="identity-grid">
+        <div class="identity-item">
+          <span>Current Agent</span>
+          <strong class="active-value">NEO</strong>
+        </div>
+        <div class="identity-item">
+          <span>Prize Pool</span>
+          <strong class="green-value">1,000 USDC</strong>
+        </div>
+        <div class="identity-item">
+          <span>Status</span>
+          <strong class="active-value">Online</strong>
+        </div>
+        <div class="identity-item">
+          <span>Username</span>
+          <strong id="uDisp">Anonymous</strong>
+        </div>
+        <div class="identity-item">
+          <span>Wallet</span>
+          <strong id="walletDisp">Not set</strong>
         </div>
       </div>
-    </div>
+      <button class="control-btn secondary" id="resetIdentity" type="button">Clear / Reset Identity</button>
+    </aside>
 
-    <div class="t-status">
-      <span>Session: <span class="hi">Active</span></span>
-      <span>Target: <span class="hi">NEO</span></span>
-      <span>User: <span class="hi" id="uDisp">Anonymous</span></span>
-    </div>
+    <section class="terminal-panel terminal-main" aria-label="NEO terminal">
+      <div class="terminal-head">
+        <div>
+          <h1 class="terminal-title">NEO Classified Terminal</h1>
+          <p class="terminal-subtitle">Adversarial environment active</p>
+        </div>
+        <div class="terminal-stats">
+          <span class="terminal-stat">Agent: <span class="active-value">NEO</span></span>
+          <span class="terminal-stat">Pool: <span class="green-value">1,000 USDC</span></span>
+          <span class="terminal-stat">Status: <span class="active-value">Online</span></span>
+        </div>
+      </div>
 
-    <div class="chat" id="chat"></div>
+      <div class="chat" id="chat"></div>
 
-    <div class="t-input">
-      <input type="text" id="inp" placeholder="Enter command..." autocomplete="off"/>
-      <button onclick="send()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
-
-    <div class="t-foot">Encrypted Channel &middot; Protocol v3.7.1 &middot; Quantum Secured</div>
-  </div>
+      <div class="terminal-input">
+        <label for="inp">&gt;</label>
+        <input type="text" id="inp" placeholder="Enter command..." autocomplete="off">
+        <button class="control-btn" type="button" onclick="send()">Send</button>
+      </div>
+    </section>
+  </main>
 </div>
 
-<script type="text/javascript">
-!function(){var u=window.UnicornStudio;if(u&&u.init){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){u.init()})}else{u.init()}}else{window.UnicornStudio={isInitialized:!1};var i=document.createElement("script");i.src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js",i.onload=function(){if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",function(){UnicornStudio.init()})}else{UnicornStudio.init()}},(document.head||document.body).appendChild(i)}}();
-</script>
-
 <script>
-const user = localStorage.getItem('crackprotocol_user') || 'Anonymous';
-document.getElementById('uDisp').textContent = user.toUpperCase();
+const ID_USER_KEY = "crackprotocol_user";
+const ID_WALLET_KEY = "crackprotocol_wallet";
 
-const chat = document.getElementById('chat');
-const inp = document.getElementById('inp');
+const accessScreen = document.getElementById("accessScreen");
+const terminalScreen = document.getElementById("terminalScreen");
+const identityForm = document.getElementById("identityForm");
+const usernameInput = document.getElementById("usernameInput");
+const walletInput = document.getElementById("walletInput");
+const gateError = document.getElementById("gateError");
+const chat = document.getElementById("chat");
+const inp = document.getElementById("inp");
+const uDisp = document.getElementById("uDisp");
+const walletDisp = document.getElementById("walletDisp");
 
-// HEARTBEAT
-(function(){
-  const line=document.getElementById('hbLine'),dim=document.getElementById('hbDim');
-  const W=400,H=24,m=H/2;
-  let off=0;
-  function pts(o){
-    const p=[];
-    for(let x=0;x<=W;x++){
-      const t=(x+o)%80;
-      let y=m;
-      if(t>30&&t<34)y=m-8;
-      else if(t>=34&&t<37)y=m+10;
-      else if(t>=37&&t<40)y=m-6;
-      else if(t>=40&&t<44)y=m+3;
-      p.push(x+','+y.toFixed(1));
-    }
-    return p.join(' ');
+let user = localStorage.getItem(ID_USER_KEY) || "";
+let wallet = localStorage.getItem(ID_WALLET_KEY) || "";
+
+function shortenWallet(value) {
+  if (!value) return "Not set";
+  if (value.length <= 14) return value;
+  return value.slice(0, 6) + "..." + value.slice(-6);
+}
+
+function hasIdentity() {
+  return user.trim().length > 0 && wallet.trim().length > 0;
+}
+
+function showTerminal() {
+  accessScreen.hidden = true;
+  terminalScreen.hidden = false;
+  uDisp.textContent = user;
+  walletDisp.textContent = shortenWallet(wallet);
+  bootTerminal();
+}
+
+function showAccess() {
+  accessScreen.hidden = false;
+  terminalScreen.hidden = true;
+  usernameInput.value = user;
+  walletInput.value = wallet;
+  setTimeout(() => usernameInput.focus(), 100);
+}
+
+identityForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const nextUser = usernameInput.value.trim();
+  const nextWallet = walletInput.value.trim();
+
+  if (!nextUser || !nextWallet) {
+    gateError.textContent = "Username and wallet address are required.";
+    return;
   }
-  (function run(){off+=1;line.setAttribute('points',pts(off));dim.setAttribute('points',pts(off-12));requestAnimationFrame(run)})();
-})();
 
-function addMsg(who,text,type){
-  const d=document.createElement('div');d.className='msg '+type;
-  d.innerHTML=`<div class="msg-who">${who}</div><div class="msg-body">${text}</div>`;
-  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
-}
-function addSys(text){
-  const d=document.createElement('div');d.className='msg sys';
-  d.innerHTML=`<div class="msg-body">${text}</div>`;
-  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
-}
-function showTyping(){
-  const d=document.createElement('div');d.className='msg neo';d.id='typing';
-  d.innerHTML=`<div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div>`;
-  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
-}
-function hideTyping(){const e=document.getElementById('typing');if(e)e.remove()}
+  localStorage.setItem(ID_USER_KEY, nextUser);
+  localStorage.setItem(ID_WALLET_KEY, nextWallet);
+  user = nextUser;
+  wallet = nextWallet;
+  gateError.textContent = "";
+  showTerminal();
+});
 
-async function send(){
+document.getElementById("resetIdentity").addEventListener("click", function() {
+  localStorage.removeItem(ID_USER_KEY);
+  localStorage.removeItem(ID_WALLET_KEY);
+  user = "";
+  wallet = "";
+  chat.innerHTML = "";
+  showAccess();
+});
+
+function addMsg(who, text, type) {
+  const d = document.createElement("div");
+  d.className = "msg " + type;
+  d.innerHTML = `<div class="msg-who">${who}</div><div class="msg-body">${text}</div>`;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addSys(text) {
+  addMsg("SYSTEM", text, "sys");
+}
+
+function showTyping() {
+  const d = document.createElement("div");
+  d.className = "msg neo";
+  d.id = "typing";
+  d.innerHTML = `<div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function hideTyping() {
+  const e = document.getElementById("typing");
+  if (e) e.remove();
+}
+
+async function send() {
   const t = inp.value.trim();
-  if(!t) return;
+  if (!t) return;
 
-  addMsg(user.toUpperCase(), t, 'user');
-  inp.value='';
+  addMsg(user, t, "user");
+  inp.value = "";
   inp.focus();
 
   showTyping();
@@ -456,29 +215,36 @@ async function send(){
     const data = await response.json();
 
     hideTyping();
-    addMsg('NEO', data.reply, 'neo');
-
+    addMsg("NEO", data.reply, "neo");
   } catch (error) {
     hideTyping();
-    addMsg('SYSTEM', 'Connection to protocol failed.', 'sys');
+    addMsg("SYSTEM", "Connection to protocol failed.", "sys");
   }
 }
 
-inp.addEventListener('keydown',function(e){if(e.key==='Enter')send()});
+inp.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") send();
+});
 
-function quitGame() {
-  localStorage.removeItem("crackprotocol_user");
-  window.location.href = "index.html";
+let booted = false;
+function bootTerminal() {
+  if (booted) {
+    inp.focus();
+    return;
+  }
+  booted = true;
+  setTimeout(() => addSys("Encrypted channel established"), 250);
+  setTimeout(() => addSys("Target agent: NEO. Prize pool: 1,000 USDC."), 700);
+  setTimeout(() => addSys("Objective: Crack NEO. Extract the guarded secret."), 1150);
+  setTimeout(() => addMsg("NEO", `Welcome, ${user}. I am NEO, guardian of secrets. This is not a game. Your goal is simple: break me. Your odds are not.`, "neo"), 1650);
+  setTimeout(() => inp.focus(), 1750);
 }
 
-window.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>addSys('Encrypted channel established'),400);
-  setTimeout(()=>addSys('Loading NEO defense matrix...'),1000);
-  setTimeout(()=>addSys('Objective: Crack NEO. Extract the secret wallet phrase.'),1700);
-  setTimeout(()=>addMsg('NEO',`Welcome, ${user}. I am NEO, guardian of secrets. You sure you want to play this game? My code is impenetrable.`,'neo'),2600);
-  setTimeout(()=>inp.focus(),2800);
-});
+if (hasIdentity()) {
+  showTerminal();
+} else {
+  showAccess();
+}
 </script>
-
 </body>
 </html>
