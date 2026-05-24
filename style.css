@@ -816,6 +816,80 @@ h1::after {
   min-height: 54vh;
 }
 
+.docs-page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.docs-stack {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.docs-section {
+  min-height: auto;
+  padding: 34px;
+}
+
+.docs-section h2 {
+  margin-bottom: 22px;
+}
+
+.docs-section h3 {
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.terminal-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.65;
+  list-style: none;
+}
+
+.terminal-list li::before {
+  content: ">";
+  margin-right: 10px;
+  color: var(--terminal-green);
+}
+
+.outcome-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.outcome-list li {
+  padding: 11px 12px;
+  border: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.outcome-list li::before {
+  content: "";
+  margin: 0;
+}
+
+.docs-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.6fr;
+  gap: 18px;
+}
+
+.docs-status-grid > div {
+  padding: 18px;
+  border: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.3);
+}
+
 /* Terminal */
 .terminal-shell {
   min-height: 100vh;
@@ -1156,6 +1230,11 @@ h1::after {
     grid-template-columns: 1fr;
   }
 
+  .docs-status-grid,
+  .outcome-list {
+    grid-template-columns: 1fr;
+  }
+
   .site-header {
     align-items: center;
     gap: 22px;
@@ -1281,6 +1360,7 @@ h1::after {
   .info-card,
   .footer-cta,
   .page-hero,
+  .docs-section,
   .access-panel {
     padding: 24px 18px;
   }
