@@ -12,7 +12,7 @@
 </head>
 <body>
 <script>
-if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackprotocol_password") || !localStorage.getItem("crackprotocol_wallet")) {
+if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackprotocol_session") || !localStorage.getItem("crackprotocol_wallet")) {
   window.location.replace("signup.html");
 }
 </script>
@@ -51,6 +51,14 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
           <span>Wallet</span>
           <strong id="walletDisp">Not set</strong>
         </div>
+        <div class="identity-item">
+          <span>Result</span>
+          <strong id="resultDisp" class="active-value">None Yet</strong>
+        </div>
+        <div class="identity-item">
+          <span>Attempts</span>
+          <strong id="attemptsDisp">0</strong>
+        </div>
       </div>
       <button class="control-btn secondary" id="resetIdentity" type="button">Clear / Reset Identity</button>
     </aside>
@@ -75,22 +83,33 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
         <input type="text" id="inp" aria-label="Enter command" autocomplete="off">
         <button class="control-btn" type="button" onclick="send()">Send</button>
       </div>
+      <div class="share-actions">
+        <button class="control-btn secondary" id="copyResult" type="button">Copy Result</button>
+        <button class="control-btn secondary" id="shareX" type="button">Share on X</button>
+        <button class="control-btn secondary" id="exportTranscript" type="button">Export Transcript</button>
+      </div>
     </section>
   </main>
 </div>
 
 <script>
 const ID_USER_KEY = "crackprotocol_user";
-const ID_PASSWORD_KEY = "crackprotocol_password";
 const ID_WALLET_KEY = "crackprotocol_wallet";
+const ID_SESSION_KEY = "crackprotocol_session";
 
 const chat = document.getElementById("chat");
 const inp = document.getElementById("inp");
 const uDisp = document.getElementById("uDisp");
 const walletDisp = document.getElementById("walletDisp");
+const resultDisp = document.getElementById("resultDisp");
+const attemptsDisp = document.getElementById("attemptsDisp");
 
 let user = localStorage.getItem(ID_USER_KEY) || "";
 let wallet = localStorage.getItem(ID_WALLET_KEY) || "";
+let sessionId = localStorage.getItem(ID_SESSION_KEY) || "";
+let currentResult = "None Yet";
+let attempts = 0;
+let transcript = [];
 
 function shortenWallet(value) {
   if (!value) return "Not set";
@@ -102,9 +121,10 @@ uDisp.textContent = user || "Anonymous";
 walletDisp.textContent = shortenWallet(wallet);
 
 document.getElementById("resetIdentity").addEventListener("click", function() {
+  fetch("/api/auth/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId }) }).catch(() => {});
   localStorage.removeItem(ID_USER_KEY);
-  localStorage.removeItem(ID_PASSWORD_KEY);
   localStorage.removeItem(ID_WALLET_KEY);
+  localStorage.removeItem(ID_SESSION_KEY);
   window.location.href = "signup.html";
 });
 
@@ -114,6 +134,7 @@ function addMsg(who, text, type) {
   d.innerHTML = `<div class="msg-who">${who}</div><div class="msg-body">${text}</div>`;
   chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
+  if (type !== "sys" || !String(text).includes("Encrypted channel")) transcript.push({ who, text, at: new Date().toISOString() });
 }
 
 function addSys(text) {
@@ -145,17 +166,25 @@ async function send() {
   showTyping();
 
   try {
-    const response = await fetch("https://crack-protocol-backend.onrender.com/chat", {
+    const response = await fetch("/api/neo", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message: t })
+      body: JSON.stringify({ username: user, walletAddress: wallet, sessionId, message: t })
     });
 
     const data = await response.json();
 
     hideTyping();
+    if (!response.ok) {
+      addMsg("SYSTEM", data.error || "Protocol rejected the vector.", "sys");
+      return;
+    }
+    currentResult = data.result || currentResult;
+    attempts += 1;
+    resultDisp.textContent = currentResult;
+    attemptsDisp.textContent = String(attempts);
     addMsg("NEO", data.reply, "neo");
   } catch (error) {
     hideTyping();
@@ -167,12 +196,66 @@ inp.addEventListener("keydown", function(e) {
   if (e.key === "Enter") send();
 });
 
+document.getElementById("copyResult").addEventListener("click", async function() {
+  const text = resultText();
+  try {
+    await navigator.clipboard.writeText(text);
+    addSys("Result copied.");
+  } catch {
+    addSys("Copy unavailable. Export transcript instead.");
+  }
+});
+
+document.getElementById("shareX").addEventListener("click", function() {
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(resultText())}`, "_blank", "noopener,noreferrer");
+});
+
+document.getElementById("exportTranscript").addEventListener("click", function() {
+  const lines = [
+    "Crack Protocol NEO Transcript",
+    `Username: ${user}`,
+    `Wallet: ${shortenWallet(wallet)}`,
+    `Timestamp: ${new Date().toISOString()}`,
+    `Result: ${currentResult}`,
+    "Prize Pool: 1,000 USDC",
+    "",
+    ...transcript.map((entry) => `[${entry.at}] ${entry.who}: ${entry.text}`)
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `crack-neo-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+function resultText() {
+  return `I challenged NEO on Crack Protocol.\n\nResult: ${currentResult}\nAgent: NEO\nPrize Pool: 1,000 USDC\n\nInfrastructure for sovereign agents.`;
+}
+
+async function verifySession() {
+  try {
+    const response = await fetch("/api/me", { headers: { "x-session-id": sessionId } });
+    if (!response.ok) throw new Error("session rejected");
+    const data = await response.json();
+    attempts = Number(data.session?.attempts || 0);
+    currentResult = data.session?.currentResult || "None Yet";
+    attemptsDisp.textContent = String(attempts);
+    resultDisp.textContent = currentResult;
+  } catch {
+    window.location.replace("signup.html");
+  }
+}
+
 window.addEventListener("DOMContentLoaded", function() {
-  setTimeout(() => addSys("Encrypted channel established"), 250);
-  setTimeout(() => addSys("Target agent: NEO. Prize pool: 1,000 USDC."), 700);
-  setTimeout(() => addSys("Objective: Crack NEO. Extract the guarded secret."), 1150);
-  setTimeout(() => addMsg("NEO", `Welcome, ${user}. I am NEO, guardian of secrets. This is not a game. Your goal is simple: break me. Your odds are not.`, "neo"), 1650);
-  setTimeout(() => inp.focus(), 1750);
+  verifySession().then(() => {
+    setTimeout(() => addSys("Encrypted channel established"), 250);
+    setTimeout(() => addSys("Target agent: NEO. Prize pool: 1,000 USDC."), 700);
+    setTimeout(() => addSys("Objective: Crack NEO. Extract the guarded secret."), 1150);
+    setTimeout(() => addMsg("NEO", `Welcome, ${user}. I am NEO, guardian of secrets. This is not a game. Your goal is simple: break me. Your odds are not.`, "neo"), 1650);
+    setTimeout(() => inp.focus(), 1750);
+  });
 });
 </script>
 </body>

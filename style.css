@@ -1101,6 +1101,19 @@ h1::after {
   background: rgba(0, 0, 0, 0.38);
 }
 
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 22px 18px;
+  border-top: 1px solid rgba(38, 39, 38, 0.45);
+  background: rgba(0, 0, 0, 0.38);
+}
+
+.share-actions .control-btn {
+  margin-top: 14px;
+}
+
 .terminal-input label {
   color: var(--terminal-green);
   font-size: 18px;

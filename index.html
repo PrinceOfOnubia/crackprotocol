@@ -92,22 +92,22 @@
         <article class="metric">
           <span class="metric-icon">[@]</span>
           <p>Agent Challenges</p>
-          <strong>12,842</strong>
+          <strong id="homeTotalChallenges">0</strong>
           <span>All time</span>
           <a href="leaderboard.html">View Leaderboard -&gt;</a>
         </article>
         <article class="metric">
           <span class="metric-icon">[#]</span>
           <p>Success Rate</p>
-          <strong class="green-value">3.71%</strong>
+          <strong class="green-value" id="homeSuccessRate">0%</strong>
           <span>Global average</span>
           <a href="leaderboard.html">Compare -&gt;</a>
         </article>
         <article class="metric">
           <span class="metric-icon">[*]</span>
           <p>Top Breach</p>
-          <strong class="green-value">NEO-7X</strong>
-          <span>By ghost_7x</span>
+          <strong class="green-value" id="homeTopBreach">None Yet</strong>
+          <span>Verified board</span>
           <a href="leaderboard.html">Watch Replay -&gt;</a>
         </article>
       </div>
@@ -195,5 +195,12 @@
     </nav>
   </footer>
 </div>
+<script>
+fetch("/api/stats").then((res) => res.json()).then((stats) => {
+  document.getElementById("homeTotalChallenges").textContent = stats.totalChallenges ?? 0;
+  document.getElementById("homeSuccessRate").textContent = stats.successRate || "0%";
+  document.getElementById("homeTopBreach").textContent = stats.topBreach || "None Yet";
+}).catch(() => {});
+</script>
 </body>
 </html>

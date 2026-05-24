@@ -25,7 +25,7 @@
     <section class="access-panel" aria-labelledby="access-title">
       <p class="page-kicker">// Classified Access Gate</p>
       <h1 id="access-title">Identify Before Terminal Entry</h1>
-      <p>Enter a username, password, and wallet address. Wallet connect arrives in v2; for now, access details are saved locally in this browser.</p>
+      <p>Enter a username, password, and wallet address. Address format is checked across common chains; ownership proof will use signatures in a later release.</p>
       <form class="gate-form" id="identityForm">
         <label class="gate-field">
           <span class="gate-label">Username</span>
@@ -42,6 +42,7 @@
         <div class="gate-error" id="gateError" aria-live="polite"></div>
         <div class="gate-actions">
           <button class="gate-btn" type="submit">Enter NEO Terminal</button>
+          <button class="gate-btn secondary" id="loginIdentity" type="button">Login</button>
           <button class="gate-btn secondary" id="clearIdentity" type="button">Clear Identity</button>
         </div>
       </form>
@@ -51,8 +52,8 @@
 
 <script>
 const ID_USER_KEY = "crackprotocol_user";
-const ID_PASSWORD_KEY = "crackprotocol_password";
 const ID_WALLET_KEY = "crackprotocol_wallet";
+const ID_SESSION_KEY = "crackprotocol_session";
 
 const identityForm = document.getElementById("identityForm");
 const usernameInput = document.getElementById("usernameInput");
@@ -65,31 +66,55 @@ walletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
 
 identityForm.addEventListener("submit", function(event) {
   event.preventDefault();
-  const nextUser = usernameInput.value.trim();
-  const nextPassword = passwordInput.value.trim();
-  const nextWallet = walletInput.value.trim();
+  authenticate("register");
+});
 
-  if (!nextUser || !nextPassword || !nextWallet) {
-    gateError.textContent = "Username, password, and wallet address are required.";
-    return;
-  }
-
-  localStorage.setItem(ID_USER_KEY, nextUser);
-  localStorage.setItem(ID_PASSWORD_KEY, nextPassword);
-  localStorage.setItem(ID_WALLET_KEY, nextWallet);
-  window.location.href = "terminal.html";
+document.getElementById("loginIdentity").addEventListener("click", function() {
+  authenticate("login");
 });
 
 document.getElementById("clearIdentity").addEventListener("click", function() {
   localStorage.removeItem(ID_USER_KEY);
-  localStorage.removeItem(ID_PASSWORD_KEY);
   localStorage.removeItem(ID_WALLET_KEY);
+  localStorage.removeItem(ID_SESSION_KEY);
   usernameInput.value = "";
   passwordInput.value = "";
   walletInput.value = "";
   gateError.textContent = "Identity cleared.";
   usernameInput.focus();
 });
+
+async function authenticate(mode) {
+  const nextUser = usernameInput.value.trim();
+  const nextPassword = passwordInput.value.trim();
+  const nextWallet = walletInput.value.trim();
+
+  if ((mode === "register" && !nextUser) || !nextPassword || !nextWallet) {
+    gateError.textContent = "Username, password, and wallet address are required.";
+    return;
+  }
+
+  gateError.textContent = mode === "register" ? "Creating access session..." : "Opening access session...";
+  try {
+    const response = await fetch(`/api/auth/${mode}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: nextUser, password: nextPassword, walletAddress: nextWallet })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      gateError.textContent = data.error || "Access rejected.";
+      return;
+    }
+    localStorage.setItem(ID_USER_KEY, data.user.username);
+    localStorage.setItem(ID_WALLET_KEY, data.user.walletAddress);
+    localStorage.setItem(ID_SESSION_KEY, data.user.sessionId);
+    passwordInput.value = "";
+    window.location.href = "terminal.html";
+  } catch (error) {
+    gateError.textContent = "Access service unavailable.";
+  }
+}
 </script>
 </body>
 </html>

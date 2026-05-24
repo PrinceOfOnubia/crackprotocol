@@ -1,0 +1,29 @@
+{
+  "name": "crack-protocol",
+  "version": "1.0.0",
+  "description": "Crack Protocol static frontend with Vercel serverless API routes.",
+  "main": "api.js",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "start": "node scripts/dev-server.mjs",
+    "vercel": "vercel dev",
+    "test": "node scripts/smoke.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrinceOfOnubia/crackprotocol.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/PrinceOfOnubia/crackprotocol/issues"
+  },
+  "homepage": "https://github.com/PrinceOfOnubia/crackprotocol#readme",
+  "dependencies": {
+    "@upstash/redis": "^1.38.0",
+    "openai": "^6.39.0",
+    "vercel": "^54.4.1"
+  }
+}

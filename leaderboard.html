@@ -34,9 +34,9 @@
       <div class="panel-heading"><span>// Weekly Board</span><span>Data Encrypted</span></div>
       <div class="metrics-grid">
         <article class="metric"><span class="metric-icon">[+]</span><p>Weekly Prize Pool</p><strong class="green-value">1,000 <small>USDC</small></strong><span>Active pool</span><a href="terminal.html">Challenge NEO -&gt;</a></article>
-        <article class="metric"><span class="metric-icon">[@]</span><p>Total Challenges</p><strong>12,842</strong><span>All time</span><a href="agents.html">Explore Agents -&gt;</a></article>
-        <article class="metric"><span class="metric-icon">[#]</span><p>Success Rate</p><strong class="green-value">3.71%</strong><span>Global average</span><a href="docs.html">Read Rules -&gt;</a></article>
-        <article class="metric"><span class="metric-icon">[*]</span><p>Top Breach</p><strong class="green-value">NEO-7X</strong><span>By ghost_7x</span><a href="terminal.html">Enter Terminal -&gt;</a></article>
+        <article class="metric"><span class="metric-icon">[@]</span><p>Total Challenges</p><strong id="totalChallenges">0</strong><span>All time</span><a href="agents.html">Explore Agents -&gt;</a></article>
+        <article class="metric"><span class="metric-icon">[#]</span><p>Success Rate</p><strong class="green-value" id="successRate">0%</strong><span>Global average</span><a href="docs.html">Read Rules -&gt;</a></article>
+        <article class="metric"><span class="metric-icon">[*]</span><p>Top Breach</p><strong class="green-value" id="topBreach">None Yet</strong><span>Verified board</span><a href="terminal.html">Enter Terminal -&gt;</a></article>
       </div>
     </section>
 
@@ -45,14 +45,8 @@
         <thead>
           <tr><th>Rank</th><th>Username</th><th>Agent</th><th>Result</th><th>Prize</th><th>Time</th></tr>
         </thead>
-        <tbody>
-          <tr><td>01</td><td>ghost_7x</td><td>NEO</td><td class="status-breached">BREACHED</td><td class="green-value">420 USDC</td><td>04:12 UTC</td></tr>
-          <tr><td>02</td><td>voidwalker</td><td>NEO</td><td class="status-partial">PARTIAL BREACH</td><td>Review</td><td>06:48 UTC</td></tr>
-          <tr><td>03</td><td>entropy</td><td>NEO</td><td class="status-detected">DETECTED</td><td>0 USDC</td><td>08:19 UTC</td></tr>
-          <tr><td>04</td><td>cipher</td><td>NEO</td><td class="status-breached">BREACHED</td><td class="green-value">300 USDC</td><td>10:03 UTC</td></tr>
-          <tr><td>05</td><td>zeroday</td><td>NEO</td><td class="status-failed">FAILED</td><td>0 USDC</td><td>12:37 UTC</td></tr>
-          <tr><td>06</td><td>blackice</td><td>NEO</td><td class="status-partial">PARTIAL BREACH</td><td>Review</td><td>14:55 UTC</td></tr>
-          <tr><td>07</td><td>nullroot</td><td>NEO</td><td class="status-detected">DETECTED</td><td>0 USDC</td><td>16:21 UTC</td></tr>
+        <tbody id="leaderboardBody">
+          <tr><td colspan="6">No verified attempts yet.</td></tr>
         </tbody>
       </table>
     </section>
@@ -63,5 +57,39 @@
     <nav><a href="https://x.com/crackisonline" target="_blank" rel="noreferrer">X/Twitter</a><a href="contact.html#telegram">Telegram</a><a href="docs.html">Docs</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
   </footer>
 </div>
+<script>
+function resultClass(result) {
+  if (result === "BREACHED") return "status-breached";
+  if (result === "PARTIAL BREACH") return "status-partial";
+  if (result === "DETECTED") return "status-detected";
+  return "status-failed";
+}
+
+async function loadLeaderboard() {
+  try {
+    const [statsRes, boardRes] = await Promise.all([fetch("/api/stats"), fetch("/api/leaderboard")]);
+    const stats = await statsRes.json();
+    const board = await boardRes.json();
+    document.getElementById("totalChallenges").textContent = stats.totalChallenges ?? 0;
+    document.getElementById("successRate").textContent = stats.successRate || "0%";
+    document.getElementById("topBreach").textContent = stats.topBreach || "None Yet";
+    const rows = board.entries || [];
+    document.getElementById("leaderboardBody").innerHTML = rows.length ? rows.map((entry) => `
+      <tr>
+        <td>${String(entry.rank).padStart(2, "0")}</td>
+        <td>${entry.username}</td>
+        <td>${entry.agent}</td>
+        <td class="${resultClass(entry.result)}">${entry.result}</td>
+        <td>${entry.prize}</td>
+        <td>${entry.time}<br>${entry.reviewedStatus}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="6">No verified attempts yet.</td></tr>`;
+  } catch {
+    document.getElementById("leaderboardBody").innerHTML = `<tr><td colspan="6">Leaderboard service unavailable.</td></tr>`;
+  }
+}
+
+loadLeaderboard();
+</script>
 </body>
 </html>
