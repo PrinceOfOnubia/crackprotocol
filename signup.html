@@ -64,6 +64,12 @@ const gateError = document.getElementById("gateError");
 usernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
 walletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
 
+fetch("/api/health").then((response) => response.json().then((data) => ({ response, data }))).then(({ response, data }) => {
+  if (!response.ok || !data.ok) gateError.textContent = "Storage is not configured. Add Upstash Redis env vars in Vercel.";
+}).catch(() => {
+  gateError.textContent = "Access service unavailable.";
+});
+
 identityForm.addEventListener("submit", function(event) {
   event.preventDefault();
   authenticate("register");
@@ -102,6 +108,9 @@ async function authenticate(mode) {
       body: JSON.stringify({ username: nextUser, password: nextPassword, walletAddress: nextWallet })
     });
     const data = await response.json();
+    if (mode === "register" && response.status === 409 && data.code === "WALLET_REGISTERED") {
+      return authenticate("login");
+    }
     if (!response.ok) {
       gateError.textContent = data.error || "Access rejected.";
       return;

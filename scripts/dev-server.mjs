@@ -13,7 +13,8 @@ const apiRoutes = {
   "/api/me": "./api/me.js",
   "/api/neo": "./api/neo.js",
   "/api/leaderboard": "./api/leaderboard.js",
-  "/api/stats": "./api/stats.js"
+  "/api/stats": "./api/stats.js",
+  "/api/health": "./api/health.js"
 };
 
 const types = {
