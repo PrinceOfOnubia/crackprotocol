@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   const storage = storageStatus();
   return send(res, storage.configured ? 200 : 503, {
     ok: storage.configured,
+    message: storage.configured ? "Access systems online." : "Access is temporarily unavailable. Please try again shortly.",
     storage
   });
 }

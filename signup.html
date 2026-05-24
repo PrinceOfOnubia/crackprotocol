@@ -65,7 +65,7 @@ usernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
 walletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
 
 fetch("/api/health").then((response) => response.json().then((data) => ({ response, data }))).then(({ response, data }) => {
-  if (!response.ok || !data.ok) gateError.textContent = "Storage is not configured. Add Upstash Redis env vars in Vercel.";
+  if (!response.ok || !data.ok) gateError.textContent = data.message || "Access is temporarily unavailable. Please try again shortly.";
 }).catch(() => {
   gateError.textContent = "Access service unavailable.";
 });

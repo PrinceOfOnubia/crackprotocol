@@ -29,6 +29,13 @@ ADMIN_SECRET=
 NEO_BREACH_SECRET=
 ```
 
+If Vercel creates Redis/KV variables with these names instead, the API also accepts them:
+
+```bash
+KV_REST_API_URL=
+KV_REST_API_TOKEN=
+```
+
 The API routes use Upstash Redis for users, sessions, attempts, statistics, and leaderboard persistence. If Redis env vars are absent during local development, the API uses an in-memory fallback so the interface can still be exercised.
 
 ## Public Testing Notes
