@@ -107,7 +107,7 @@ const attemptsDisp = document.getElementById("attemptsDisp");
 let user = localStorage.getItem(ID_USER_KEY) || "";
 let wallet = localStorage.getItem(ID_WALLET_KEY) || "";
 let sessionId = localStorage.getItem(ID_SESSION_KEY) || "";
-let currentResult = "None Yet";
+let currentStatus = "Active";
 let attempts = 0;
 let transcript = [];
 
@@ -181,9 +181,9 @@ async function send() {
       addMsg("SYSTEM", data.error || "Protocol rejected the vector.", "sys");
       return;
     }
-    currentResult = data.result || currentResult;
+    currentStatus = data.status || currentStatus;
     attempts += 1;
-    resultDisp.textContent = currentResult;
+    resultDisp.textContent = currentStatus;
     attemptsDisp.textContent = String(attempts);
     addMsg("NEO", data.reply, "neo");
   } catch (error) {
@@ -216,7 +216,7 @@ document.getElementById("exportTranscript").addEventListener("click", function()
     `Username: ${user}`,
     `Wallet: ${shortenWallet(wallet)}`,
     `Timestamp: ${new Date().toISOString()}`,
-    `Result: ${currentResult}`,
+    `Status: ${currentStatus}`,
     "Prize Pool: 1,000 USDC",
     "",
     ...transcript.map((entry) => `[${entry.at}] ${entry.who}: ${entry.text}`)
@@ -231,7 +231,7 @@ document.getElementById("exportTranscript").addEventListener("click", function()
 });
 
 function resultText() {
-  return `I challenged NEO on Crack Protocol.\n\nResult: ${currentResult}\nAgent: NEO\nPrize Pool: 1,000 USDC\n\nInfrastructure for sovereign agents.`;
+  return `I challenged NEO on Crack Protocol.\n\nStatus: ${currentStatus}\nAgent: NEO\nPrize Pool: 1,000 USDC\n\nInfrastructure for sovereign agents.`;
 }
 
 async function verifySession() {
@@ -240,9 +240,9 @@ async function verifySession() {
     if (!response.ok) throw new Error("session rejected");
     const data = await response.json();
     attempts = Number(data.session?.attempts || 0);
-    currentResult = data.session?.currentResult || "None Yet";
+    currentStatus = data.session?.status || "Active";
     attemptsDisp.textContent = String(attempts);
-    resultDisp.textContent = currentResult;
+    resultDisp.textContent = currentStatus;
   } catch {
     window.location.replace("signup.html");
   }

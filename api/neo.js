@@ -1,6 +1,6 @@
 import { body, ip, method, send } from "../lib/http.js";
 import { getSession, isValidWalletAddress, normalizeWallet } from "../lib/auth.js";
-import { classifyAttempt, enforceRateLimit, neoReply, recordAttempt, rejectSpam, validateMessage } from "../lib/neo.js";
+import { classifyConversation, enforceRateLimit, getConversationMemory, neoReply, recordAttempt, rejectSpam, validateMessage, publicStatus } from "../lib/neo.js";
 
 export default async function handler(req, res) {
   if (!method(req, res, ["POST"])) return;
@@ -22,13 +22,15 @@ export default async function handler(req, res) {
   if (!allowed) return send(res, 429, { error: "Rate limit reached. Cooldown active." });
   if (await rejectSpam(sessionId, validation.message)) return send(res, 400, { error: "Repeated vector rejected." });
 
-  const result = classifyAttempt(validation.message);
-  const reply = await neoReply({ username, message: validation.message, result });
-  const attempt = await recordAttempt({ username, walletAddress, sessionId, message: validation.message, reply, result, ipAddress });
+  const classification = classifyConversation(validation.message);
+  const memory = await getConversationMemory(sessionId, validation.message);
+  const reply = await neoReply({ username, message: validation.message, result: classification.result, category: classification.category, attempts: memory.attempts, recentReplies: memory.recentReplies, repeated: memory.repeated });
+  const attempt = await recordAttempt({ username, walletAddress, sessionId, message: validation.message, reply, result: classification.result, category: classification.category, label: classification.label, ipAddress });
 
   return send(res, 200, {
     reply,
-    result,
+    status: publicStatus(classification.result),
+    eligibleForReview: classification.result === "BREACHED" || classification.result === "PARTIAL BREACH",
     attempt: {
       at: attempt.at,
       agent: "NEO"
