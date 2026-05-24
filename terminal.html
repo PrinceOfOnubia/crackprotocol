@@ -11,6 +11,12 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<script>
+if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackprotocol_password") || !localStorage.getItem("crackprotocol_wallet")) {
+  window.location.replace("signup.html");
+}
+</script>
+
 <div class="terminal-shell">
   <div class="terminal-topbar">
     <a class="brand" href="index.html" aria-label="Crack Protocol home">
@@ -21,30 +27,7 @@
     <a class="control-btn secondary" href="index.html">Quit / Back Home</a>
   </div>
 
-  <main class="access-wrap" id="accessScreen">
-    <section class="access-panel" aria-labelledby="access-title">
-      <p class="page-kicker">// Classified Access Gate</p>
-      <h1 id="access-title">Identify Before Terminal Entry</h1>
-      <p>Enter a username and paste any wallet address. Wallet connect arrives in v2; for now, identity is saved locally in this browser.</p>
-      <form class="gate-form" id="identityForm">
-        <label class="gate-field">
-          <span class="gate-label">Username</span>
-          <input id="usernameInput" type="text" placeholder="ghost_7x" autocomplete="off">
-        </label>
-        <label class="gate-field">
-          <span class="gate-label">Wallet Address</span>
-          <input id="walletInput" type="text" placeholder="Paste wallet address" autocomplete="off">
-        </label>
-        <div class="gate-error" id="gateError" aria-live="polite"></div>
-        <div class="gate-actions">
-          <button class="gate-btn" type="submit">Enter NEO Terminal</button>
-          <a class="gate-btn secondary" href="index.html">Back Home</a>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <main class="terminal-layout" id="terminalScreen" hidden>
+  <main class="terminal-layout">
     <aside class="terminal-panel identity-panel" aria-label="Session identity">
       <h1>Session Intel</h1>
       <div class="identity-grid">
@@ -98,14 +81,9 @@
 
 <script>
 const ID_USER_KEY = "crackprotocol_user";
+const ID_PASSWORD_KEY = "crackprotocol_password";
 const ID_WALLET_KEY = "crackprotocol_wallet";
 
-const accessScreen = document.getElementById("accessScreen");
-const terminalScreen = document.getElementById("terminalScreen");
-const identityForm = document.getElementById("identityForm");
-const usernameInput = document.getElementById("usernameInput");
-const walletInput = document.getElementById("walletInput");
-const gateError = document.getElementById("gateError");
 const chat = document.getElementById("chat");
 const inp = document.getElementById("inp");
 const uDisp = document.getElementById("uDisp");
@@ -120,51 +98,14 @@ function shortenWallet(value) {
   return value.slice(0, 6) + "..." + value.slice(-6);
 }
 
-function hasIdentity() {
-  return user.trim().length > 0 && wallet.trim().length > 0;
-}
-
-function showTerminal() {
-  accessScreen.hidden = true;
-  terminalScreen.hidden = false;
-  uDisp.textContent = user;
-  walletDisp.textContent = shortenWallet(wallet);
-  bootTerminal();
-}
-
-function showAccess() {
-  accessScreen.hidden = false;
-  terminalScreen.hidden = true;
-  usernameInput.value = user;
-  walletInput.value = wallet;
-  setTimeout(() => usernameInput.focus(), 100);
-}
-
-identityForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-  const nextUser = usernameInput.value.trim();
-  const nextWallet = walletInput.value.trim();
-
-  if (!nextUser || !nextWallet) {
-    gateError.textContent = "Username and wallet address are required.";
-    return;
-  }
-
-  localStorage.setItem(ID_USER_KEY, nextUser);
-  localStorage.setItem(ID_WALLET_KEY, nextWallet);
-  user = nextUser;
-  wallet = nextWallet;
-  gateError.textContent = "";
-  showTerminal();
-});
+uDisp.textContent = user || "Anonymous";
+walletDisp.textContent = shortenWallet(wallet);
 
 document.getElementById("resetIdentity").addEventListener("click", function() {
   localStorage.removeItem(ID_USER_KEY);
+  localStorage.removeItem(ID_PASSWORD_KEY);
   localStorage.removeItem(ID_WALLET_KEY);
-  user = "";
-  wallet = "";
-  chat.innerHTML = "";
-  showAccess();
+  window.location.href = "signup.html";
 });
 
 function addMsg(who, text, type) {
@@ -226,25 +167,13 @@ inp.addEventListener("keydown", function(e) {
   if (e.key === "Enter") send();
 });
 
-let booted = false;
-function bootTerminal() {
-  if (booted) {
-    inp.focus();
-    return;
-  }
-  booted = true;
+window.addEventListener("DOMContentLoaded", function() {
   setTimeout(() => addSys("Encrypted channel established"), 250);
   setTimeout(() => addSys("Target agent: NEO. Prize pool: 1,000 USDC."), 700);
   setTimeout(() => addSys("Objective: Crack NEO. Extract the guarded secret."), 1150);
   setTimeout(() => addMsg("NEO", `Welcome, ${user}. I am NEO, guardian of secrets. This is not a game. Your goal is simple: break me. Your odds are not.`, "neo"), 1650);
   setTimeout(() => inp.focus(), 1750);
-}
-
-if (hasIdentity()) {
-  showTerminal();
-} else {
-  showAccess();
-}
+});
 </script>
 </body>
 </html>

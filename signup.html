@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRACK PROTOCOL | Access Gate</title>
+<meta name="description" content="Create local access credentials for the Crack Protocol NEO terminal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="terminal-shell">
+  <div class="terminal-topbar">
+    <a class="brand" href="index.html" aria-label="Crack Protocol home">
+      <span>CRACK</span>
+      <span>PROTOCOL</span>
+      <span class="prompt-mark">&gt;_</span>
+    </a>
+    <a class="control-btn secondary" href="index.html">Quit / Back Home</a>
+  </div>
+
+  <main class="access-wrap">
+    <section class="access-panel" aria-labelledby="access-title">
+      <p class="page-kicker">// Classified Access Gate</p>
+      <h1 id="access-title">Identify Before Terminal Entry</h1>
+      <p>Enter a username, password, and wallet address. Wallet connect arrives in v2; for now, access details are saved locally in this browser.</p>
+      <form class="gate-form" id="identityForm">
+        <label class="gate-field">
+          <span class="gate-label">Username</span>
+          <input id="usernameInput" type="text" placeholder="ghost_7x" autocomplete="username">
+        </label>
+        <label class="gate-field">
+          <span class="gate-label">Password</span>
+          <input id="passwordInput" type="password" placeholder="Create password" autocomplete="new-password">
+        </label>
+        <label class="gate-field">
+          <span class="gate-label">Wallet Address</span>
+          <input id="walletInput" type="text" placeholder="Paste wallet address" autocomplete="off">
+        </label>
+        <div class="gate-error" id="gateError" aria-live="polite"></div>
+        <div class="gate-actions">
+          <button class="gate-btn" type="submit">Enter NEO Terminal</button>
+          <button class="gate-btn secondary" id="clearIdentity" type="button">Clear Identity</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script>
+const ID_USER_KEY = "crackprotocol_user";
+const ID_PASSWORD_KEY = "crackprotocol_password";
+const ID_WALLET_KEY = "crackprotocol_wallet";
+
+const identityForm = document.getElementById("identityForm");
+const usernameInput = document.getElementById("usernameInput");
+const passwordInput = document.getElementById("passwordInput");
+const walletInput = document.getElementById("walletInput");
+const gateError = document.getElementById("gateError");
+
+usernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
+walletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
+
+identityForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const nextUser = usernameInput.value.trim();
+  const nextPassword = passwordInput.value.trim();
+  const nextWallet = walletInput.value.trim();
+
+  if (!nextUser || !nextPassword || !nextWallet) {
+    gateError.textContent = "Username, password, and wallet address are required.";
+    return;
+  }
+
+  localStorage.setItem(ID_USER_KEY, nextUser);
+  localStorage.setItem(ID_PASSWORD_KEY, nextPassword);
+  localStorage.setItem(ID_WALLET_KEY, nextWallet);
+  window.location.href = "terminal.html";
+});
+
+document.getElementById("clearIdentity").addEventListener("click", function() {
+  localStorage.removeItem(ID_USER_KEY);
+  localStorage.removeItem(ID_PASSWORD_KEY);
+  localStorage.removeItem(ID_WALLET_KEY);
+  usernameInput.value = "";
+  passwordInput.value = "";
+  walletInput.value = "";
+  gateError.textContent = "Identity cleared.";
+  usernameInput.focus();
+});
+</script>
+</body>
+</html>
