@@ -1125,11 +1125,6 @@ h1::after {
   border-color: var(--terminal-green);
 }
 
-.terminal-input input::placeholder,
-.gate-field input::placeholder {
-  color: var(--text-muted);
-}
-
 .control-btn {
   min-height: 44px;
   padding: 0 16px;
