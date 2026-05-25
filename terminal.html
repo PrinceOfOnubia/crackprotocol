@@ -28,7 +28,7 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
   </div>
 
   <main class="terminal-layout">
-    <aside class="terminal-panel identity-panel" aria-label="Session identity">
+    <aside class="terminal-panel identity-panel" id="sessionInfoPanel" aria-label="Session identity">
       <h1>Session Intel</h1>
       <div class="identity-grid">
         <div class="identity-item">
@@ -70,9 +70,10 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
           <p class="terminal-subtitle">Adversarial environment active</p>
         </div>
         <div class="terminal-stats">
-          <span class="terminal-stat">Agent: <span class="active-value">NEO</span></span>
-          <span class="terminal-stat">Pool: <span class="green-value">1,000 USDC</span></span>
           <span class="terminal-stat">Status: <span class="active-value">Online</span></span>
+          <span class="terminal-stat">Prize Pool: <span class="green-value">1,000 USDC</span></span>
+          <span class="terminal-stat desktop-agent-stat">Agent: <span class="active-value">NEO</span></span>
+          <button class="control-btn secondary session-info-toggle" id="sessionInfoToggle" type="button" aria-expanded="false" aria-controls="sessionInfoPanel">Session Info</button>
         </div>
       </div>
 
@@ -103,6 +104,8 @@ const uDisp = document.getElementById("uDisp");
 const walletDisp = document.getElementById("walletDisp");
 const resultDisp = document.getElementById("resultDisp");
 const attemptsDisp = document.getElementById("attemptsDisp");
+const sessionInfoToggle = document.getElementById("sessionInfoToggle");
+const sessionInfoPanel = document.getElementById("sessionInfoPanel");
 
 let user = localStorage.getItem(ID_USER_KEY) || "";
 let wallet = localStorage.getItem(ID_WALLET_KEY) || "";
@@ -128,10 +131,34 @@ document.getElementById("resetIdentity").addEventListener("click", function() {
   window.location.href = "signup.html";
 });
 
+sessionInfoToggle.addEventListener("click", function() {
+  const expanded = sessionInfoPanel.classList.toggle("is-open");
+  sessionInfoToggle.setAttribute("aria-expanded", String(expanded));
+});
+
 function addMsg(who, text, type) {
   const d = document.createElement("div");
   d.className = "msg " + type;
-  d.innerHTML = `<div class="msg-who">${who}</div><div class="msg-body">${text}</div>`;
+  if (type === "neo") {
+    const avatar = document.createElement("span");
+    avatar.className = "neo-message-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+    d.appendChild(avatar);
+  }
+
+  const msgContent = document.createElement("div");
+  msgContent.className = "msg-content";
+
+  const msgWho = document.createElement("div");
+  msgWho.className = "msg-who";
+  msgWho.textContent = who;
+
+  const msgBody = document.createElement("div");
+  msgBody.className = "msg-body";
+  msgBody.textContent = text;
+
+  msgContent.append(msgWho, msgBody);
+  d.appendChild(msgContent);
   chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
   if (type !== "sys" || !String(text).includes("Encrypted channel")) transcript.push({ who, text, at: new Date().toISOString() });
@@ -145,7 +172,7 @@ function showTyping() {
   const d = document.createElement("div");
   d.className = "msg neo";
   d.id = "typing";
-  d.innerHTML = `<div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  d.innerHTML = `<span class="neo-message-avatar" aria-hidden="true"></span><div class="msg-content"><div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
   chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
 }

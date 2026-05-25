@@ -410,6 +410,31 @@ h1::after {
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 3px);
 }
 
+.neo-avatar-slot::before {
+  content: "NEO";
+  position: absolute;
+  inset: 22px 72px 18px;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 18px;
+  border: 1px solid rgba(111, 185, 122, 0.42);
+  border-radius: 999px 999px 18px 18px;
+  color: rgba(111, 185, 122, 0.82);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 56% 36%, rgba(111, 185, 122, 0.92) 0 4px, transparent 5px),
+    radial-gradient(ellipse at 50% 35%, rgba(238, 238, 239, 0.18), transparent 34%),
+    url("assets/neo-avatar.png"),
+    linear-gradient(145deg, #050605, #141716 42%, #020302);
+  background-size: 100% 4px, auto, auto, cover, auto;
+  background-position: center;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  box-shadow: inset 0 0 24px rgba(111, 185, 122, 0.08), 0 0 28px rgba(111, 185, 122, 0.12);
+  opacity: 0.9;
+}
+
 .portrait-core {
   position: absolute;
   inset: 15px 44px 0;
@@ -525,6 +550,16 @@ h1::after {
   display: inline-flex;
   font-size: 11px;
   transition: color 180ms ease, transform 180ms ease;
+}
+
+.metric-disabled {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  font-size: 10px;
 }
 
 .metric a:hover,
@@ -994,6 +1029,10 @@ h1::after {
   background: rgba(0, 0, 0, 0.32);
 }
 
+.session-info-toggle {
+  display: none;
+}
+
 .chat {
   flex: 1;
   min-height: 430px;
@@ -1018,6 +1057,46 @@ h1::after {
 .msg {
   max-width: min(78%, 760px);
   animation: msgIn 0.22s ease;
+}
+
+.msg.neo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.msg-content {
+  min-width: 0;
+}
+
+.neo-message-avatar {
+  position: relative;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(111, 185, 122, 0.5);
+  border-radius: 999px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 60% 38%, var(--terminal-green) 0 3px, transparent 4px),
+    url("assets/neo-avatar.png"),
+    radial-gradient(circle at 50% 45%, #1e2320, #020302 68%);
+  background-size: 100% 4px, auto, cover, auto;
+  background-position: center;
+  box-shadow: 0 0 16px rgba(111, 185, 122, 0.18);
+}
+
+.neo-message-avatar::before {
+  content: "NEO";
+  position: absolute;
+  right: 0;
+  bottom: 4px;
+  left: 0;
+  color: rgba(111, 185, 122, 0.86);
+  font-size: 7px;
+  text-align: center;
 }
 
 @keyframes msgIn {
@@ -1134,6 +1213,7 @@ h1::after {
 
 .terminal-input input {
   flex: 1;
+  min-width: 0;
   padding: 13px 14px;
 }
 
@@ -1285,11 +1365,30 @@ h1::after {
   }
 
   .terminal-main {
-    min-height: 640px;
+    order: 1;
+    min-height: calc(100svh - 130px);
+  }
+
+  .identity-panel {
+    order: 2;
+    display: none;
+  }
+
+  .identity-panel.is-open {
+    display: block;
+  }
+
+  .desktop-agent-stat {
+    display: none;
+  }
+
+  .session-info-toggle {
+    display: inline-flex;
   }
 
   .chat {
-    max-height: 560px;
+    min-height: 52svh;
+    max-height: none;
   }
 }
 
@@ -1391,11 +1490,82 @@ h1::after {
     justify-content: flex-start;
   }
 
+  .desktop-agent-stat {
+    display: none;
+  }
+
+  .session-info-toggle {
+    display: inline-flex;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .identity-panel {
+    display: none;
+  }
+
+  .identity-panel.is-open {
+    display: block;
+  }
+
+  .terminal-main {
+    min-height: calc(100svh - 112px);
+  }
+
+  .terminal-title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .terminal-head {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .chat {
+    min-height: 50svh;
+    padding: 16px;
+    gap: 12px;
+  }
+
   .terminal-input {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(92px, auto);
     align-items: stretch;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .terminal-input .control-btn {
+    min-height: 50px;
+    padding: 0 18px;
+  }
+
+  .share-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0 16px 16px;
+  }
+
+  .share-actions .control-btn {
+    width: 100%;
   }
 
   .msg {
-    max-width: 94%;
+    max-width: 100%;
+  }
+
+  .msg-body {
+    padding: 12px 13px;
+    font-size: 12px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .neo-message-avatar {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    margin-top: 18px;
   }
 }
