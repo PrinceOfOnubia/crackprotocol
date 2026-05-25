@@ -1451,11 +1451,13 @@ h1::after {
   .terminal-main {
     order: 1;
     min-height: calc(100svh - 130px);
+    scroll-margin-top: 14px;
   }
 
   .identity-panel {
     order: 2;
     display: none;
+    scroll-margin-top: 14px;
   }
 
   .identity-panel.is-open {
@@ -1641,8 +1643,9 @@ h1::after {
   }
 
   .send-icon-btn {
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
   }
 
   .share-actions {

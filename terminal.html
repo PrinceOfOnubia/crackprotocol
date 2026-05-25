@@ -136,18 +136,32 @@ document.getElementById("resetIdentity").addEventListener("click", function() {
 });
 
 sessionInfoToggle.addEventListener("click", function() {
-  const expanded = sessionInfoPanel.classList.toggle("is-open");
-  sessionInfoToggle.setAttribute("aria-expanded", String(expanded));
-  if (expanded) scrollToPanel(sessionInfoPanel);
+  openSessionInfo();
 });
 
 backToTerminal.addEventListener("click", function() {
+  closeSessionInfo();
   scrollToPanel(terminalPanel);
 });
 
+function openSessionInfo() {
+  sessionInfoPanel.classList.add("is-open");
+  sessionInfoToggle.setAttribute("aria-expanded", "true");
+  sessionInfoToggle.textContent = "Session Info Open";
+  scrollToPanel(sessionInfoPanel);
+}
+
+function closeSessionInfo() {
+  sessionInfoPanel.classList.remove("is-open");
+  sessionInfoToggle.setAttribute("aria-expanded", "false");
+  sessionInfoToggle.textContent = "Session Info";
+}
+
 function scrollToPanel(panel) {
   window.requestAnimationFrame(() => {
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    const offset = 14;
+    const top = panel.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
   });
 }
 
