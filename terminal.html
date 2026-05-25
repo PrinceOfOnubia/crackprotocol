@@ -82,7 +82,7 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
 
       <div class="terminal-input">
         <label for="inp">&gt;</label>
-        <input type="text" id="inp" aria-label="Enter command" autocomplete="off">
+        <textarea id="inp" aria-label="Enter command" autocomplete="off" rows="2" spellcheck="false"></textarea>
         <button class="control-btn" type="button" onclick="send()">Send</button>
       </div>
       <div class="share-actions">
@@ -201,6 +201,7 @@ async function send() {
 
   addMsg(user, t, "user");
   inp.value = "";
+  resizeInput();
   inp.focus();
 
   showTyping();
@@ -233,7 +234,17 @@ async function send() {
 }
 
 inp.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") send();
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+});
+
+inp.addEventListener("input", resizeInput);
+
+function resizeInput() {
+  inp.style.height = "auto";
+  inp.style.height = Math.min(inp.scrollHeight, 148) + "px";
 });
 
 document.getElementById("copyResult").addEventListener("click", async function() {
