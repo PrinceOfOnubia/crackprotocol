@@ -1,5 +1,5 @@
 import { body, method, send } from "../../lib/http.js";
-import { createSession, hashPassword, isValidWalletAddress, normalizeWallet, publicUser, walletKey } from "../../lib/auth.js";
+import { createSession, hashPassword, isValidWalletAddress, normalizeWallet, publicUser, usernameKey } from "../../lib/auth.js";
 import { getJSON, incr, nowISO, setJSON } from "../../lib/store.js";
 
 export default async function handler(req, res) {
@@ -14,9 +14,9 @@ export default async function handler(req, res) {
     if (!isValidWalletAddress(walletAddress)) return send(res, 400, { error: "Wallet address format is not recognized." });
     if (password.length < 6) return send(res, 400, { error: "Password must be at least 6 characters." });
 
-    const key = `user:${walletKey(walletAddress)}`;
+    const key = `user:username:${usernameKey(username)}`;
     const existing = await getJSON(key, null);
-    if (existing) return send(res, 409, { error: "Wallet already registered. Log in to continue.", code: "WALLET_REGISTERED" });
+    if (existing) return send(res, 409, { error: "Identity already exists. Login instead.", code: "USERNAME_REGISTERED" });
 
     const user = {
       username,

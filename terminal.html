@@ -124,7 +124,6 @@ uDisp.textContent = user || "Anonymous";
 walletDisp.textContent = shortenWallet(wallet);
 
 document.getElementById("resetIdentity").addEventListener("click", function() {
-  fetch("/api/auth/logout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId }) }).catch(() => {});
   localStorage.removeItem(ID_USER_KEY);
   localStorage.removeItem(ID_WALLET_KEY);
   localStorage.removeItem(ID_SESSION_KEY);

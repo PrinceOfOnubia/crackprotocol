@@ -1254,6 +1254,34 @@ h1::after {
   margin-top: 26px;
 }
 
+.gate-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.gate-tab {
+  min-height: 46px;
+  border: 1px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.gate-tab.active,
+.gate-tab:hover {
+  border-color: var(--terminal-green);
+  color: var(--terminal-green);
+  background: rgba(111, 185, 122, 0.08);
+}
+
+.gate-panel[hidden] {
+  display: none;
+}
+
 .gate-field {
   display: grid;
   gap: 9px;

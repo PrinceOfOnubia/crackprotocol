@@ -1,5 +1,5 @@
 import { method, send } from "../lib/http.js";
-import { getSession, publicUser, walletKey } from "../lib/auth.js";
+import { getSession, publicUser, usernameKey } from "../lib/auth.js";
 import { getJSON } from "../lib/store.js";
 import { publicStatus } from "../lib/neo.js";
 
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const sessionId = req.headers["x-session-id"] || req.query?.sessionId;
     const session = await getSession(sessionId);
     if (!session) return send(res, 401, { error: "No active session." });
-    const user = await getJSON(`user:${walletKey(session.walletAddress)}`, null);
+    const user = await getJSON(`user:username:${usernameKey(session.username)}`, null);
     if (!user) return send(res, 401, { error: "No active session." });
     return send(res, 200, {
       user: publicUser(user, session.sessionId),

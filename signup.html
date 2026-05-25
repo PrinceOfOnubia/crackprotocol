@@ -25,25 +25,46 @@
     <section class="access-panel" aria-labelledby="access-title">
       <p class="page-kicker">// Classified Access Gate</p>
       <h1 id="access-title">Identify Before Terminal Entry</h1>
-      <p>Enter a username, password, and wallet address. Address format is checked across common chains; ownership proof will use signatures in a later release.</p>
-      <form class="gate-form" id="identityForm">
+      <p>Register once with wallet address. After that, login with username and password.</p>
+
+      <div class="gate-tabs" role="tablist" aria-label="Access mode">
+        <button class="gate-tab active" id="registerTab" type="button" role="tab" aria-selected="true" aria-controls="registerPanel">Register</button>
+        <button class="gate-tab" id="loginTab" type="button" role="tab" aria-selected="false" aria-controls="loginPanel">Login</button>
+      </div>
+
+      <form class="gate-form gate-panel active" id="registerPanel" role="tabpanel" aria-labelledby="registerTab">
         <label class="gate-field">
           <span class="gate-label">Username</span>
-          <input id="usernameInput" type="text" aria-label="Username" autocomplete="username">
+          <input id="registerUsernameInput" type="text" aria-label="Register username" autocomplete="username">
         </label>
         <label class="gate-field">
           <span class="gate-label">Password</span>
-          <input id="passwordInput" type="password" aria-label="Password" autocomplete="new-password">
+          <input id="registerPasswordInput" type="password" aria-label="Register password" autocomplete="new-password">
         </label>
         <label class="gate-field">
           <span class="gate-label">Wallet Address</span>
-          <input id="walletInput" type="text" aria-label="Wallet address" autocomplete="off">
+          <input id="registerWalletInput" type="text" aria-label="Wallet address" autocomplete="off">
         </label>
-        <div class="gate-error" id="gateError" aria-live="polite"></div>
+        <div class="gate-error" id="registerGateError" aria-live="polite"></div>
         <div class="gate-actions">
-          <button class="gate-btn" type="submit">Enter NEO Terminal</button>
-          <button class="gate-btn secondary" id="loginIdentity" type="button">Login</button>
-          <button class="gate-btn secondary" id="clearIdentity" type="button">Clear Identity</button>
+          <button class="gate-btn" type="submit">Create Identity</button>
+          <button class="gate-btn secondary clear-local-identity" type="button">Clear Local Identity</button>
+        </div>
+      </form>
+
+      <form class="gate-form gate-panel" id="loginPanel" role="tabpanel" aria-labelledby="loginTab" hidden>
+        <label class="gate-field">
+          <span class="gate-label">Username</span>
+          <input id="loginUsernameInput" type="text" aria-label="Login username" autocomplete="username">
+        </label>
+        <label class="gate-field">
+          <span class="gate-label">Password</span>
+          <input id="loginPasswordInput" type="password" aria-label="Login password" autocomplete="current-password">
+        </label>
+        <div class="gate-error" id="loginGateError" aria-live="polite"></div>
+        <div class="gate-actions">
+          <button class="gate-btn" type="submit">Enter Terminal</button>
+          <button class="gate-btn secondary clear-local-identity" type="button">Clear Local Identity</button>
         </div>
       </form>
     </section>
@@ -55,73 +76,141 @@ const ID_USER_KEY = "crackprotocol_user";
 const ID_WALLET_KEY = "crackprotocol_wallet";
 const ID_SESSION_KEY = "crackprotocol_session";
 
-const identityForm = document.getElementById("identityForm");
-const usernameInput = document.getElementById("usernameInput");
-const passwordInput = document.getElementById("passwordInput");
-const walletInput = document.getElementById("walletInput");
-const gateError = document.getElementById("gateError");
+const registerTab = document.getElementById("registerTab");
+const loginTab = document.getElementById("loginTab");
+const registerPanel = document.getElementById("registerPanel");
+const loginPanel = document.getElementById("loginPanel");
+const registerUsernameInput = document.getElementById("registerUsernameInput");
+const registerPasswordInput = document.getElementById("registerPasswordInput");
+const registerWalletInput = document.getElementById("registerWalletInput");
+const loginUsernameInput = document.getElementById("loginUsernameInput");
+const loginPasswordInput = document.getElementById("loginPasswordInput");
+const registerGateError = document.getElementById("registerGateError");
+const loginGateError = document.getElementById("loginGateError");
 
-usernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
-walletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
+registerUsernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
+loginUsernameInput.value = localStorage.getItem(ID_USER_KEY) || "";
+registerWalletInput.value = localStorage.getItem(ID_WALLET_KEY) || "";
+
+verifyExistingSession();
 
 fetch("/api/health").then((response) => response.json().then((data) => ({ response, data }))).then(({ response, data }) => {
-  if (!response.ok || !data.ok) gateError.textContent = data.message || "Access is temporarily unavailable. Please try again shortly.";
+  if (!response.ok || !data.ok) showError(activeMode(), data.message || "Access is temporarily unavailable. Please try again shortly.");
 }).catch(() => {
-  gateError.textContent = "Access service unavailable.";
+  showError(activeMode(), "Access service unavailable.");
 });
 
-identityForm.addEventListener("submit", function(event) {
+registerTab.addEventListener("click", function() {
+  switchMode("register");
+});
+
+loginTab.addEventListener("click", function() {
+  switchMode("login");
+});
+
+registerPanel.addEventListener("submit", function(event) {
   event.preventDefault();
   authenticate("register");
 });
 
-document.getElementById("loginIdentity").addEventListener("click", function() {
+loginPanel.addEventListener("submit", function(event) {
+  event.preventDefault();
   authenticate("login");
 });
 
-document.getElementById("clearIdentity").addEventListener("click", function() {
+document.querySelectorAll(".clear-local-identity").forEach((button) => button.addEventListener("click", function() {
   localStorage.removeItem(ID_USER_KEY);
   localStorage.removeItem(ID_WALLET_KEY);
   localStorage.removeItem(ID_SESSION_KEY);
-  usernameInput.value = "";
-  passwordInput.value = "";
-  walletInput.value = "";
-  gateError.textContent = "Identity cleared.";
-  usernameInput.focus();
-});
+  registerUsernameInput.value = "";
+  registerPasswordInput.value = "";
+  registerWalletInput.value = "";
+  loginUsernameInput.value = "";
+  loginPasswordInput.value = "";
+  showError(activeMode(), "Local identity cleared.");
+  (activeMode() === "register" ? registerUsernameInput : loginUsernameInput).focus();
+}));
+
+function activeMode() {
+  return loginPanel.hidden ? "register" : "login";
+}
+
+function switchMode(mode) {
+  const isRegister = mode === "register";
+  registerTab.classList.toggle("active", isRegister);
+  loginTab.classList.toggle("active", !isRegister);
+  registerTab.setAttribute("aria-selected", String(isRegister));
+  loginTab.setAttribute("aria-selected", String(!isRegister));
+  registerPanel.hidden = !isRegister;
+  loginPanel.hidden = isRegister;
+  registerPanel.classList.toggle("active", isRegister);
+  loginPanel.classList.toggle("active", !isRegister);
+  registerGateError.textContent = "";
+  loginGateError.textContent = "";
+  (isRegister ? registerUsernameInput : loginUsernameInput).focus();
+}
+
+function showError(mode, message) {
+  (mode === "register" ? registerGateError : loginGateError).textContent = message;
+}
 
 async function authenticate(mode) {
-  const nextUser = usernameInput.value.trim();
-  const nextPassword = passwordInput.value.trim();
-  const nextWallet = walletInput.value.trim();
+  const isRegister = mode === "register";
+  const nextUser = (isRegister ? registerUsernameInput : loginUsernameInput).value.trim();
+  const nextPassword = (isRegister ? registerPasswordInput : loginPasswordInput).value.trim();
+  const nextWallet = registerWalletInput.value.trim();
 
-  if ((mode === "register" && !nextUser) || !nextPassword || !nextWallet) {
-    gateError.textContent = "Username, password, and wallet address are required.";
+  if (!nextUser) {
+    showError(mode, "Username is required.");
+    return;
+  }
+  if (!nextPassword) {
+    showError(mode, "Password is required.");
+    return;
+  }
+  if (isRegister && !nextWallet) {
+    showError(mode, "Wallet address is required.");
     return;
   }
 
-  gateError.textContent = mode === "register" ? "Creating access session..." : "Opening access session...";
+  showError(mode, isRegister ? "Creating identity..." : "Opening terminal...");
   try {
+    const payload = isRegister
+      ? { username: nextUser, password: nextPassword, walletAddress: nextWallet }
+      : { username: nextUser, password: nextPassword };
     const response = await fetch(`/api/auth/${mode}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: nextUser, password: nextPassword, walletAddress: nextWallet })
+      body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (mode === "register" && response.status === 409 && data.code === "WALLET_REGISTERED") {
-      return authenticate("login");
-    }
     if (!response.ok) {
-      gateError.textContent = data.error || "Access rejected.";
+      showError(mode, data.error || "Access rejected.");
       return;
     }
     localStorage.setItem(ID_USER_KEY, data.user.username);
     localStorage.setItem(ID_WALLET_KEY, data.user.walletAddress);
     localStorage.setItem(ID_SESSION_KEY, data.user.sessionId);
-    passwordInput.value = "";
+    registerPasswordInput.value = "";
+    loginPasswordInput.value = "";
     window.location.href = "terminal.html";
   } catch (error) {
-    gateError.textContent = "Access service unavailable.";
+    showError(mode, "Access service unavailable.");
+  }
+}
+
+async function verifyExistingSession() {
+  const sessionId = localStorage.getItem(ID_SESSION_KEY);
+  if (!sessionId) return;
+  try {
+    const response = await fetch("/api/me", { headers: { "x-session-id": sessionId } });
+    if (!response.ok) throw new Error("session rejected");
+    const data = await response.json();
+    localStorage.setItem(ID_USER_KEY, data.user.username);
+    localStorage.setItem(ID_WALLET_KEY, data.user.walletAddress);
+    window.location.replace("terminal.html");
+  } catch {
+    localStorage.removeItem(ID_SESSION_KEY);
   }
 }
 </script>
