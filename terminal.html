@@ -60,10 +60,11 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
           <strong id="attemptsDisp">0</strong>
         </div>
       </div>
+      <button class="control-btn secondary session-back-toggle" id="backToTerminal" type="button">Back to Terminal</button>
       <button class="control-btn secondary" id="resetIdentity" type="button">Clear / Reset Identity</button>
     </aside>
 
-    <section class="terminal-panel terminal-main" aria-label="NEO terminal">
+    <section class="terminal-panel terminal-main" id="terminalPanel" aria-label="NEO terminal">
       <div class="terminal-head">
         <div>
           <h1 class="terminal-title">NEO Classified Terminal</h1>
@@ -106,6 +107,8 @@ const resultDisp = document.getElementById("resultDisp");
 const attemptsDisp = document.getElementById("attemptsDisp");
 const sessionInfoToggle = document.getElementById("sessionInfoToggle");
 const sessionInfoPanel = document.getElementById("sessionInfoPanel");
+const terminalPanel = document.getElementById("terminalPanel");
+const backToTerminal = document.getElementById("backToTerminal");
 
 let user = localStorage.getItem(ID_USER_KEY) || "";
 let wallet = localStorage.getItem(ID_WALLET_KEY) || "";
@@ -133,7 +136,18 @@ document.getElementById("resetIdentity").addEventListener("click", function() {
 sessionInfoToggle.addEventListener("click", function() {
   const expanded = sessionInfoPanel.classList.toggle("is-open");
   sessionInfoToggle.setAttribute("aria-expanded", String(expanded));
+  if (expanded) scrollToPanel(sessionInfoPanel);
 });
+
+backToTerminal.addEventListener("click", function() {
+  scrollToPanel(terminalPanel);
+});
+
+function scrollToPanel(panel) {
+  window.requestAnimationFrame(() => {
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
 
 function addMsg(who, text, type) {
   const d = document.createElement("div");
