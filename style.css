@@ -1181,12 +1181,29 @@ h1::after {
 }
 
 .terminal-input {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   padding: 18px 22px;
   border-top: 1px solid var(--panel-border);
   background: rgba(0, 0, 0, 0.38);
+}
+
+.terminal-composer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(rgba(111, 185, 122, 0.025) 1px, transparent 1px),
+    rgba(0, 0, 0, 0.54);
+  background-size: 100% 4px, auto;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.terminal-composer:focus-within {
+  border-color: var(--terminal-green);
+  box-shadow: 0 0 24px rgba(111, 185, 122, 0.1);
 }
 
 .share-actions {
@@ -1202,26 +1219,33 @@ h1::after {
   margin-top: 14px;
 }
 
-.terminal-input label {
+.terminal-prompt-mark {
   color: var(--terminal-green);
   font-size: 18px;
+  line-height: 1;
+  padding-bottom: 12px;
 }
 
 .terminal-input textarea,
 .gate-field input {
   width: 100%;
-  border: 1px solid var(--panel-border);
   outline: none;
-  background: rgba(0, 0, 0, 0.5);
   color: var(--text-primary);
+}
+
+.gate-field input {
+  border: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .terminal-input textarea {
   flex: 1;
   min-width: 0;
-  min-height: 50px;
-  max-height: 148px;
-  padding: 13px 14px;
+  min-height: 78px;
+  max-height: 190px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   line-height: 1.55;
   overflow-y: auto;
   resize: none;
@@ -1229,9 +1253,29 @@ h1::after {
   overflow-wrap: anywhere;
 }
 
-.terminal-input textarea:focus,
 .gate-field input:focus {
   border-color: var(--terminal-green);
+}
+
+.send-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--terminal-green);
+  border-radius: 6px;
+  background: var(--terminal-green);
+  color: #020302;
+  cursor: pointer;
+  font-size: 21px;
+  line-height: 1;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.send-icon-btn:hover {
+  transform: translateY(-1px);
+  background: var(--green-soft);
+  box-shadow: 0 0 28px rgba(111, 185, 122, 0.14);
 }
 
 .control-btn {
@@ -1582,16 +1626,23 @@ h1::after {
   }
 
   .terminal-input {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) minmax(92px, auto);
-    align-items: stretch;
-    gap: 10px;
     padding: 14px 16px;
   }
 
-  .terminal-input .control-btn {
-    min-height: 50px;
-    padding: 0 18px;
+  .terminal-composer {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .terminal-input textarea {
+    min-height: 94px;
+    max-height: 210px;
+  }
+
+  .send-icon-btn {
+    width: 48px;
+    height: 48px;
   }
 
   .share-actions {

@@ -80,10 +80,12 @@ if (!localStorage.getItem("crackprotocol_user") || !localStorage.getItem("crackp
 
       <div class="chat" id="chat"></div>
 
-      <div class="terminal-input">
-        <label for="inp">&gt;</label>
-        <textarea id="inp" aria-label="Enter command" autocomplete="off" rows="2" spellcheck="false"></textarea>
-        <button class="control-btn" type="button" onclick="send()">Send</button>
+      <div class="terminal-input" aria-label="Command composer">
+        <div class="terminal-composer">
+          <label class="terminal-prompt-mark" for="inp">&gt;</label>
+          <textarea id="inp" aria-label="Enter command" autocomplete="off" rows="3" spellcheck="false"></textarea>
+          <button class="send-icon-btn" type="button" onclick="send()" aria-label="Send command"><span aria-hidden="true">&uarr;</span></button>
+        </div>
       </div>
       <div class="share-actions">
         <button class="control-btn secondary" id="copyResult" type="button">Copy Result</button>
@@ -244,8 +246,8 @@ inp.addEventListener("input", resizeInput);
 
 function resizeInput() {
   inp.style.height = "auto";
-  inp.style.height = Math.min(inp.scrollHeight, 148) + "px";
-});
+  inp.style.height = Math.min(inp.scrollHeight, 190) + "px";
+}
 
 document.getElementById("copyResult").addEventListener("click", async function() {
   const text = resultText();
