@@ -168,15 +168,6 @@ function scrollToPanel(panel) {
 function addMsg(who, text, type) {
   const d = document.createElement("div");
   d.className = "msg " + type;
-  if (type === "neo") {
-    const avatar = document.createElement("span");
-    avatar.className = "neo-message-avatar";
-    avatar.setAttribute("aria-hidden", "true");
-    d.appendChild(avatar);
-  }
-
-  const msgContent = document.createElement("div");
-  msgContent.className = "msg-content";
 
   const msgWho = document.createElement("div");
   msgWho.className = "msg-who";
@@ -186,8 +177,7 @@ function addMsg(who, text, type) {
   msgBody.className = "msg-body";
   msgBody.textContent = text;
 
-  msgContent.append(msgWho, msgBody);
-  d.appendChild(msgContent);
+  d.append(msgWho, msgBody);
   chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
   if (type !== "sys" || !String(text).includes("Encrypted channel")) transcript.push({ who, text, at: new Date().toISOString() });
@@ -201,7 +191,7 @@ function showTyping() {
   const d = document.createElement("div");
   d.className = "msg neo";
   d.id = "typing";
-  d.innerHTML = `<span class="neo-message-avatar" aria-hidden="true"></span><div class="msg-content"><div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  d.innerHTML = `<div class="msg-who">NEO</div><div class="msg-body"><div class="typing"><span></span><span></span><span></span></div></div>`;
   chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
 }
